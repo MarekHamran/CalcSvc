@@ -1,0 +1,37 @@
+services:
+  calcsvc:
+    image: ${DOCKER_REGISTRY-}calcsvc
+    build:
+      context: .
+      dockerfile: CalcSvc/Dockerfile
+    networks:
+      - net
+    depends_on:
+      - postgres
+      - rabbitmq
+  postgres:
+    image: postgres:14-alpine
+    container_name: postgres
+    environment:
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=pgpassword
+      - PGDATA=/etc/data
+    volumes:
+      - db:/etc/data
+    ports:
+      - "5332:5432"
+    networks:
+      - net
+  rabbitmq:
+    image: rabbitmq:management
+    container_name: rabbitmq
+    ports:
+      - "5672:5672"
+      - "15672:15672"
+    networks:
+      - net
+networks:
+  net:
+    driver: bridge
+volumes:
+  db:
